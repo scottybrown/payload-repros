@@ -1,0 +1,10 @@
+import type { CollectionConfig } from 'payload'
+
+export const Posts: CollectionConfig = {
+  slug: 'posts',
+  fields: [
+    { name: 'title', type: 'text', required: true },
+    // Identical, except for a condition.
+    { name: 'subtitle', type: 'text', required: true, admin: { condition: () => true } },
+  ],
+}
