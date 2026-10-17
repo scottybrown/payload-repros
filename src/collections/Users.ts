@@ -7,7 +7,7 @@ export const Users: CollectionConfig = {
   },
   auth: true,
   fields: [
-    // Email added by default
-    // Add more fields as needed
+    // The documented override of an auth field: a field with the same name. hidden avoids a duplicate input.
+    { name: 'password', type: 'text', hidden: true, minLength: 8 },
   ],
 }
