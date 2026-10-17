@@ -9,6 +9,9 @@ branch's diff. The `hosted` branch combines the ones a deployment can show (see 
 
 Versions: Payload 3.90.2, Next 16.4.0, Postgres. The `hosted` branch uses Next 16.3.8.
 
+Ready-to-paste issue text, in the fields of Payload's v3 bug report template, is in [`tickets/`](tickets),
+one file per issue.
+
 ## File as new issues
 
 | # | Bug | Repro | Related | Notes |
