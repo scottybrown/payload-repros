@@ -5,8 +5,11 @@ code change.
 
 ## Steps
 
-1. `pnpm dev`, open `/admin/create-first-user`.
-2. Enter any email, `ab` as both passwords, and press Create.
+1. `pnpm dev`, open `/admin/reset/anything`. No real token is needed: the browser
+   check runs before the token is checked.
+2. Enter `ab` in both password fields and press Reset Password.
+
+The create-first-user screen truncates the same message in the same way.
 
 ## Expected
 
@@ -17,8 +20,7 @@ characters."
 
 The tooltip is a single line, clipped with an ellipsis at the field's width, so it reads
 "This value must be longer than the minimum length of ..." The number the user needs is the
-part cut off. There's no way to see the rest: it doesn't wrap, and the text isn't
-available on hover.
+part cut off, because the tooltip doesn't wrap.
 
 ![Truncated error tooltip](password-error-truncated.png)
 
