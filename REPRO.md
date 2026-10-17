@@ -4,7 +4,11 @@ Payload 3.90.2, Next 16.4.0 (Turbopack, dev), Postgres.
 
 ## Setup
 
-`next.config.ts`: `cacheComponents: true`. Nothing else changed.
+- `next.config.ts`: `cacheComponents: true`, plus `partialPrefetching: true` (Next asks for it
+  to be set explicitly). `cacheComponents` alone is enough to reproduce.
+- `src/app/(frontend)/page.tsx`: the template's home page is replaced with a static one,
+  because it reads auth outside `<Suspense>` and fails `next build` under Cache Components.
+  Unrelated to the bug.
 
 ## Steps
 
