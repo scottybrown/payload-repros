@@ -16,7 +16,8 @@ one file per issue.
 
 | # | Bug | Repro | Related | Notes |
 |---|---|---|---|---|
-| 1 | Reset password ignores the `password` field override: the reset screen says "minimum length of 3" and the server accepts `abc` | [reset-password-skips-validation](https://github.com/scottybrown/payload-repros/compare/main...repro/reset-password-skips-validation) | #7582 (closed, about the hook) | Workaround: patch the `password` validator's default `minLength` (`payload/dist/fields/validations.js`), which the reset path falls back to |
+| 1 | The `reset-password` endpoint skips the `password` field's validation: it accepts `abc` when the field override requires 8 | [reset-password-skips-validation](https://github.com/scottybrown/payload-repros/compare/main...repro/reset-password-skips-validation) | #7582 (closed, about the hook) | Workaround: patch the `password` validator's default `minLength` (`payload/dist/fields/validations.js`), which the reset path falls back to |
+| 2 | The admin's password inputs (Create New / change password, and the reset screen) ignore the `password` field override, so `ab` gets "minimum 3" from the admin and `abc` gets "minimum 8" from the server | [password-minimum-not-configurable](https://github.com/scottybrown/payload-repros/compare/main...repro/password-minimum-not-configurable) | #11982 (locked; a comment reports exactly this) | Separate from #1: both screens render `PasswordField` with a fixed inline field. Same patch is the workaround |
 | 3 | Field error tooltip truncates the message, cutting off "...minimum length of ..." on the reset password screen | [password-error-truncated](https://github.com/scottybrown/payload-repros/compare/main...repro/password-error-truncated) | #16774 (vertical clipping, not the same) | Also on create-first-user |
 | 4 | Admin `generateMetadata` reads runtime data, so Cache Components blocks the route's metadata (dev) | [admin-blocking-route-warning](https://github.com/scottybrown/payload-repros/compare/main...repro/admin-blocking-route-warning) | #18065 (mentioned in one comment) | Dev only. Fixes would mean editing Payload's generated `page.tsx` |
 | 5 | "More versions..." drawer closes as soon as it opens | [more-versions-drawer-closes](https://github.com/scottybrown/payload-repros/compare/main...repro/more-versions-drawer-closes) | #16270 (different drawer) | Only `next dev` with `cacheComponents`; production builds are fine. Low priority |
@@ -36,7 +37,6 @@ one file per issue.
 
 | # | Item | Why |
 |---|---|---|
-| 2 | Password minimum fixed at 3 | Not a bug. Configurable with a field override, `{ name: 'password', type: 'text', hidden: true, minLength: 8 }`, which the server and the admin create screen apply. Reset ignores it, which is #1. The override adds an unused `password` column; nothing is ever written to it. [Record of the check](https://github.com/scottybrown/payload-repros/compare/main...repro/password-minimum-not-configurable) |
 | 10 | Drafts aren't validated | A configuration default (`versions.drafts.validate: false`), not a bug |
 | 13 | A field condition makes its column nullable | By design: validation skips a field whose condition is false, so the column has to allow NULL. [Record of the check](https://github.com/scottybrown/payload-repros/compare/main...repro/condition-drops-not-null) |
 
