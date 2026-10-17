@@ -1,35 +1,22 @@
-# The password minimum length is fixed at 3 and can't be configured
+# Not a bug: the password minimum length is configurable
 
-Payload 3.90.2, Next 16.4.0, Postgres. The untouched blank template; no code change.
+Payload 3.90.2, Next 16.4.0, Postgres. **Don't file.** Kept as a record of the check.
 
-## Steps
+The default minimum is 3. The documented way to change it is to override the auth
+field with a field of the same name
+([Authentication overview](https://payloadcms.com/docs/authentication/overview),
+"can be overridden by defining a custom field with the same name"):
 
-1. `pnpm dev`, open `/admin/create-first-user`.
-2. Enter `ab` as the password and submit. The field reports "This value must be
-   longer than the minimum length of 3 characters."
-3. Enter `abc`. The user is created and signed in.
+```ts
+fields: [{ name: 'password', type: 'text', hidden: true, minLength: 8 }]
+```
 
-## Expected
+Tested on this template:
 
-A way to set the minimum, for example on `auth` in the collection config, which the
-server and the admin's own browser-side check both apply.
+| Where | Result |
+|---|---|
+| REST `first-register` and `POST /api/users` with `abcd` | Refused: "minimum length of 8 characters" |
+| Admin, Users > Create New with `abcd` | Browser check: "minimum length of 8 characters" |
 
-## Actual
-
-There's no option for it:
-
-- `IncomingAuthType` (`payload/dist/auth/types.d.ts`) has no minimum-length or
-  password-policy setting.
-- The `password` validator in `payload/dist/fields/validations.js` defaults
-  `minLength = 3`. Nothing passes it a different value: the admin builds its password
-  input inline (`@payloadcms/ui` `Edit/Auth`) and never reads a field from the collection.
-- A `beforeValidate` hook can refuse short passwords on the server, but the admin's
-  browser check still says "minimum length of 3", so the hook and the admin disagree.
-  The hook also doesn't apply on reset password (a separate issue).
-
-The only way we found to raise the floor is patching the validator's default.
-
-## Prior art
-
-#11982 "I'm unable to change the validation rules for the password field in the users
-collection", closed and locked in April 2025 without a fix.
+The one place it isn't applied is reset password. That's the bug, and it's on
+`repro/reset-password-skips-validation`.
