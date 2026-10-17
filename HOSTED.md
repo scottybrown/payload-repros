@@ -21,8 +21,8 @@ Sign up as the first user at `/admin`.
 
 | # | Where | Do this | See this | Branch |
 |---|---|---|---|---|
-| 2 | Users > Create New | Password `abc` | Accepted. The minimum is fixed at 3 and isn't configurable | `repro/password-minimum-not-configurable` |
-| 3 | Users > Create New | Password `ab`, Save | The error tooltip is cut off before the number | `repro/password-error-truncated` |
+| 1 | Users > Create New, then `/admin/reset/anything` (logged out) | Password `abcd` on each | Create New: "minimum length of 8", from the `password` field override. Reset: "minimum length of 3", because reset ignores the override | `repro/reset-password-skips-validation` |
+| 3 | `/admin/reset/anything` (logged out) | Password `ab` in both fields, Reset Password | The error tooltip is cut off before the number | `repro/password-error-truncated` |
 | 8 | Scheduled Posts | Create, Save Draft, then the arrow by Publish > Schedule Publish | Unpublish is preselected on a page that was never published | `repro/schedule-drawer-defaults-unpublish` |
 | 6 | Scheduled Posts | Schedule a publish a minute ahead, wait, reopen the drawer | "No upcoming events", though the job is still queued | `repro/upcoming-events-hides-overdue` |
 | 7 | Refused Schedule Posts | Schedule a publish | "Scheduled successfully." Nothing was scheduled: the jobs collection refused it | `repro/schedule-drawer-false-success` |
@@ -32,7 +32,10 @@ Sign up as the first user at `/admin`.
 
 Not shown here:
 
-- **1 (reset password):** needs the reset token, which is only in the database.
+- **1, server side:** the reset endpoint accepting `abc` needs a real token, which is only
+  in the database. See the branch.
+- **2:** not a bug. The minimum is configurable with the `password` field override in
+  `src/collections/Users.ts`.
 - **4 and 5:** only happen in `next dev` with Cache Components.
 - **13:** by design.
 
