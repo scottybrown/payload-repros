@@ -41,10 +41,10 @@ Binaries:
   Node: 22.18.0
   pnpm: 10.14.0
 Relevant Packages:
-  payload: 3.90.2
+  payload: 3.91.0
   next: 16.4.0
-  @payloadcms/db-postgres: 3.90.2
-  @payloadcms/ui/shared: 3.90.2
+  @payloadcms/db-postgres: 3.91.0
+  @payloadcms/ui/shared: 3.91.0
   react: 19.2.6
 Operating System:
   Platform: darwin
