@@ -7,7 +7,7 @@ results, and the source responsible. Each link below is a compare view showing j
 branch's diff. The `hosted` branch combines the ones a deployment can show (see its
 `HOSTED.md`).
 
-Versions: Payload 3.90.2, Next 16.4.0, Postgres. The `hosted` branch uses Next 16.3.8.
+Versions: Payload 3.91.0, Next 16.4.0, Postgres. The `hosted` branch uses Next 16.3.8.
 
 Ready-to-paste issue text, in the fields of Payload's v3 bug report template, is in [`tickets/`](tickets),
 one file per issue.
@@ -31,7 +31,7 @@ one file per issue.
 
 | # | Bug | Repro | Issue | What to add |
 |---|---|---|---|---|
-| 12 | Unique-value error comes back as a raw key (`error:followingFieldsInvalid`), and Create New renders blank | [unique-error-raw-key](https://github.com/scottybrown/payload-repros/compare/main...repro/unique-error-raw-key) | #15126 | On 3.90.2 it blanks on the first Create New, not only the second. Cause of the "key not found": `initReq` loads the client-side translations, which lack those keys |
+| 12 | Unique-value error comes back as a raw key (`error:followingFieldsInvalid`), and Create New renders blank | [unique-error-raw-key](https://github.com/scottybrown/payload-repros/compare/main...repro/unique-error-raw-key) | #15126 | On 3.91.0 it blanks on the first Create New, not only the second. Cause of the "key not found": `initReq` loads the client-side translations, which lack those keys |
 
 ## Don't file
 
