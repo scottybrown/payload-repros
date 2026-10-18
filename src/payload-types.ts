@@ -123,6 +123,7 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  password?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -140,7 +141,6 @@ export interface User {
         expiresAt: string;
       }[]
     | null;
-  password?: string | null;
   collection: 'users';
 }
 /**
@@ -241,6 +241,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  password?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

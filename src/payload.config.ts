@@ -20,6 +20,15 @@ export default buildConfig({
   },
   collections: [Users, Media],
   editor: lexicalEditor(),
+  // Writes each email, reset link included, to the server log, so the reset flow can be followed in the browser.
+  email: () => ({
+    name: 'log',
+    defaultFromAddress: 'repro@example.com',
+    defaultFromName: 'Repro',
+    sendEmail: async (message) => {
+      console.log(`EMAIL to ${String(message.to)}: ${String(message.html)}`)
+    },
+  }),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),

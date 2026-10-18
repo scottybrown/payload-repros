@@ -4,56 +4,47 @@ Payload 3.90.2, Next 16.4.0, Postgres.
 
 ## Setup
 
-`src/collections/Users.ts` sets an 8-character minimum the documented way: by overriding the
-auth `password` field with a field of the same name
-([Authentication overview](https://payloadcms.com/docs/authentication/overview)).
+- `src/collections/Users.ts` sets an 8-character minimum the documented way: by overriding the
+  auth `password` field with a field of the same name
+  ([Authentication overview](https://payloadcms.com/docs/authentication/overview)).
 
-```ts
-fields: [{ name: 'password', type: 'text', hidden: true, minLength: 8 }]
-```
+  ```ts
+  fields: [{ name: 'password', type: 'text', hidden: true, minLength: 8 }]
+  ```
 
-Everywhere else applies it. REST create and first-register refuse `abcd`, and the admin's
-Users > Create New reports "minimum length of 8 characters".
+- `src/payload.config.ts` has a minimal email adapter that writes each email to the server
+  log, so the reset link can be followed. No `serverURL` is set, so the link in the email is
+  relative. Open it on `http://localhost:3000`.
 
 ## Steps
 
-```bash
-pnpm dev
+All in the admin.
 
-# 1. First user, valid password
-curl -X POST localhost:3000/api/users/first-register -H 'Content-Type: application/json' \
-  -d '{"email":"dev@example.com","password":"longenough1"}'
-
-# 2. Ask for a reset, and read the token (no email adapter is configured)
-curl -X POST localhost:3000/api/users/forgot-password -H 'Content-Type: application/json' \
-  -d '{"email":"dev@example.com"}'
-psql "$DATABASE_URL" -c 'select reset_password_token from users where id = 1'
-
-# 3a. In the admin: open /admin/reset/<token>, enter "ab" in both fields, submit
-# 3b. Over REST: reset to "abc"
-curl -X POST localhost:3000/api/users/reset-password -H 'Content-Type: application/json' \
-  -d '{"token":"<token>","password":"abc"}'
-```
-
-Step 3a needs no real token. `/admin/reset/anything` renders the form, and the browser
-check runs before the token is checked.
+1. `pnpm dev`, open `/admin`, and create the first user with password `longenough1`.
+2. Users > Create New, with any email and password `abc`, then Save. It's refused:
+   "minimum length of 8 characters". This is the expected behaviour.
+3. Log out. On the login screen, choose "Forgot password?", enter the first user's email and submit.
+4. Open the reset link from the email in the server log (`EMAIL to …`).
+5. Enter `abc` as the new password, confirm it, and press Reset Password.
 
 ## Expected
 
-Both are refused with "minimum length of 8 characters".
+Step 5 is refused with "minimum length of 8 characters", as step 2 is.
 
 ## Actual
 
-- **3a, admin:** the reset screen's browser check reports "minimum length of **3**
-  characters". It ignores the field's `minLength`.
-- **3b, server:** returns 200 "Password reset successfully.", and `abc` logs in.
+"Password reset successfully." The user is signed in, and can log in again with `abc`.
 
-So the reset path applies neither the field's validation nor its configured minimum, in
-the browser or on the server. A `beforeValidate` hook doesn't help either. On reset it
-runs after the password has been hashed: `data` holds `salt` and `hash`, but no `password`.
+`resetPassword` (`payload/dist/auth/operations/resetPassword.js`) hashes the new password with
+`generatePasswordSaltHash`. That checks it with the `password` validator against a hardcoded
+field with no `minLength`, so the default of 3 applies. It then writes with
+`payload.db.updateOne`, so the collection's field validation never runs.
+
+The reset screen's own browser check also uses 3 instead of the field's 8. That's a separate
+issue, on `repro/password-minimum-not-configurable`.
 
 ## Prior art
 
 #7582 "Reset Password form is not running beforeValidate hook", closed as fixed in
-v3.0.0-beta.114. The hook now runs, but without the password, and that issue didn't cover
-the field's own validation.
+v3.0.0-beta.114. The hook now runs, but after hashing: `data` holds `salt` and `hash`, not
+`password`.
