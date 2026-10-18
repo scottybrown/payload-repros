@@ -1,6 +1,6 @@
 # "Upcoming Events" hides a scheduled publish once its time has passed, even though it hasn't run
 
-Payload 3.90.2, Next 16.4.0, Postgres.
+Payload 3.91.0, Next 16.4.0, Postgres.
 
 ## Setup
 
