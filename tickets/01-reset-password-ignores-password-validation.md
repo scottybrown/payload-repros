@@ -18,6 +18,8 @@ https://github.com/scottybrown/payload-repros/tree/repro/reset-password-skips-va
 
 All in the admin. The repro's config includes a minimal email adapter that writes each email to the server log, so the reset link can be followed.
 
+Setup: copy `.env.example` to `.env` and point `DATABASE_URL` at an empty Postgres database.
+
 1. `pnpm dev`, open `/admin`, and create the first user with password `longenough1`.
 2. Users > Create New, with any email and password `abc`, then Save. It's refused with "minimum length of 8 characters", as expected.
 3. Log out, choose "Forgot password?", enter the first user's email and submit.
