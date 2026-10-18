@@ -1,8 +1,8 @@
-# `reset-password` skips the `password` field's validation
+# Reset password ignores the `password` field's validation
 
 ## Describe the Bug
 
-A password minimum set with the documented `password` field override (`{ name: 'password', type: 'text', hidden: true, minLength: 8 }`) is enforced by create and update, but not by `POST /api/users/reset-password`, which accepts `abc`. The user can then log in with it.
+A password minimum set with the documented `password` field override (`{ name: 'password', type: 'text', hidden: true, minLength: 8 }`) is enforced when creating or updating a user, but not on reset password. Through Forgot password, a user can set their password to `abc` and log in with it.
 
 `resetPassword` (`payload/dist/auth/operations/resetPassword.js`) hashes the new password with `generatePasswordSaltHash`. That runs the `password` validator against a hardcoded field with no `minLength`, so the default of 3 applies. It then writes with `payload.db.updateOne`, so the collection's field validation never runs. A `beforeValidate` hook doesn't help either: it runs after hashing, and `data` holds `salt` and `hash` but no `password`.
 
@@ -16,17 +16,17 @@ https://github.com/scottybrown/payload-repros/tree/repro/reset-password-skips-va
 
 ## Reproduction Steps
 
-1. `pnpm dev`, and create the first user with an 8+ character password.
-2. `POST /api/users` with password `abcd`: refused, "minimum length of 8 characters" (expected).
-3. `POST /api/users/forgot-password` for the first user, then read `reset_password_token` from the `users` table (no email adapter is configured).
-4. Reset to `abc`:
-   ```bash
-   curl -X POST localhost:3000/api/users/reset-password -H 'Content-Type: application/json' \
-     -d '{"token":"<token>","password":"abc"}'
-   ```
-   Returns 200 "Password reset successfully.", and `abc` logs in.
+All in the admin. The repro's config includes a minimal email adapter that writes each email to the server log, so the reset link can be followed.
 
-Expected: step 4 is refused with the field's minimum of 8, as step 2 is.
+1. `pnpm dev`, open `/admin`, and create the first user with password `longenough1`.
+2. Users > Create New, with any email and password `abc`, then Save. It's refused with "minimum length of 8 characters", as expected.
+3. Log out, choose "Forgot password?", enter the first user's email and submit.
+4. Open the reset link from the email in the server log, on `http://localhost:3000`. The link is relative because no `serverURL` is set.
+5. Enter `abc` as the new password, confirm it, and press Reset Password.
+
+Expected: step 5 is refused with "minimum length of 8 characters", as step 2 is.
+
+Actual: "Password reset successfully." The user is signed in, and can log in again with `abc`.
 
 Related: #7582 (closed). It fixed the hook running at all, but not this.
 
