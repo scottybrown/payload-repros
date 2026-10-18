@@ -20,6 +20,8 @@ Payload 3.91.0, Next 16.4.0, Postgres.
 
 All in the admin.
 
+Setup: copy `.env.example` to `.env` and point `DATABASE_URL` at an empty Postgres database.
+
 1. `pnpm dev`, open `/admin`, and create the first user with password `longenough1`.
 2. Users > Create New, with any email and password `abc`, then Save. It's refused:
    "minimum length of 8 characters". This is the expected behaviour.
