@@ -1,6 +1,7 @@
 # A field condition makes its database column nullable
 
-Payload 3.90.2, Postgres. **Verdict: by design, not a bug.** Kept to show the mechanism.
+Payload 3.91.0, Postgres. The migration below was generated on 3.90.2; the schema code that
+decides it is the same in 3.91.0. **Verdict: by design, not a bug.** Kept to show the mechanism.
 
 ## Setup
 
