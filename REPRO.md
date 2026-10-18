@@ -1,6 +1,6 @@
 # Admin's generateMetadata blocks the route under Cache Components
 
-Payload 3.90.2, Next 16.4.0 (Turbopack, dev), Postgres.
+Payload 3.91.0, Next 16.4.0 (Turbopack, dev), Postgres.
 
 ## Setup
 
@@ -18,14 +18,16 @@ Payload 3.90.2, Next 16.4.0 (Turbopack, dev), Postgres.
 ## Actual
 
 ```text
-GET /admin 200
-Error: Route "/admin/[[...segments]]": Next.js encountered runtime data in `generateMetadata()`.
+Error: Route "/admin/[[...segments]]": Next.js encountered URL data in `generateMetadata()`.
 
-This route's metadata is blocked, but the rest of its content can be prerendered. `cookies()`,
-`headers()`, `params`, or `searchParams` accessed in `generateMetadata()` cause it to run dynamically.
+This route's metadata is blocked, but the rest of its content can be prefetched. `params` or
+`searchParams` accessed in `generateMetadata()` prevent it from being prefetched.
 
 Learn more: https://nextjs.org/docs/messages/blocking-prerender-metadata-runtime
 ```
+
+With `cacheComponents` alone, without `partialPrefetching`, Next words the same finding as
+"encountered runtime data in `generateMetadata()` ... cause it to run dynamically".
 
 The generated `app/(payload)/admin/[[...segments]]/page.tsx` exports
 `generateMetadata = ({ params, searchParams }) => generatePageMetadata({ config, params, searchParams })`.
@@ -48,5 +50,5 @@ itself dynamic in a way Next accepts.
 #18065 "Errors on Admin during development from Next JS 16.3 with Cache Components
 Enabled" is about the `new Date()` / uncached-data errors in `initReq` and `RootLayout`.
 This `generateMetadata` warning is only mentioned in passing in one comment there
-(on 4.0 canary). The same run also shows #18065's RootLayout "uncached data" error;
-this repro is only about the metadata one.
+(on 4.0 canary). The same run also shows #18065's `new Date()` error from `RootLayout` in the
+browser console; this repro is only about the metadata one.
