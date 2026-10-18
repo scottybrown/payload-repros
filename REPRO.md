@@ -1,6 +1,6 @@
 # "More versions..." drawer closes as soon as it opens, in dev with Cache Components
 
-Payload 3.90.2, Next 16.4.0 (Turbopack), Postgres.
+Payload 3.91.0, Next 16.4.0 (Turbopack), Postgres.
 
 ## Setup
 
@@ -13,7 +13,8 @@ Payload 3.90.2, Next 16.4.0 (Turbopack), Postgres.
 
 ## Steps
 
-1. `pnpm dev`, sign in, create a post and save 15 drafts of it (or `PATCH /api/posts/:id?draft=true` 14 times).
+1. `pnpm dev`, sign in, create a post, then change its title and Save Draft until it has
+   about 15 versions (the number used when this was verified).
 2. Open Versions, then open the latest version.
 3. Open the comparison dropdown and choose "More versions...".
 
