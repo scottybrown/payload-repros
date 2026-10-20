@@ -1,37 +1,30 @@
-# Admin password inputs ignore the `password` field's validation, so the admin and server report different minimums
+# Admin Create New checks passwords against a minimum of 3, ignoring the `password` field's `minLength`
 
 ## Describe the Bug
 
-With the documented `password` field override (`{ name: 'password', type: 'text', hidden: true, minLength: 8 }`), the server enforces 8 characters, but the admin's own password inputs still check against the built-in default of 3. In Users > Create New:
+A password minimum set with the documented `password` field override (`{ name: 'password', type: 'text', hidden: true, minLength: 8 }`) is enforced by the server, but **not** by the admin's own check on Users > Create New, which still uses the default minimum of 3. A 2-character password is refused with "minimum length of 3 characters", then a 3-character one is refused with "minimum length of 8 characters". The user is told two different minimums.
 
-- `ab`: the admin refuses it with "minimum length of **3** characters", without sending it to the server.
-- `abc`: the admin accepts it and sends it, and the server refuses it with "minimum length of **8** characters".
+Create New renders the password input inline with a fixed field, `PasswordField field={{ name: 'password', label, required: true }}` (`@payloadcms/ui` `dist/views/Edit/Auth/index.js`), and never reads the collection's `password` field for validation. It checks the override only for its access permissions (`hasPasswordFieldOverride`).
 
-So the user is told 3, then 8. The reset password screen has the same browser-side check, and also says 3.
+We've worked around this by patching the `password` validator's default `minLength` in `payload/dist/fields/validations.js`, which the admin's check falls back to.
 
-Both screens render the password input inline with a fixed field, `PasswordField field={{ name: 'password', label, required: true }}`:
-
-- the edit view in `@payloadcms/ui` `dist/views/Edit/Auth/index.js`;
-- the reset form in `@payloadcms/next` `dist/views/ResetPassword/ResetPasswordForm/index.js`.
-
-Neither reads the collection's `password` field for validation. The edit view checks the override only for its access permissions.
-
-**Workaround:** patch the `password` validator's default `minLength` in `payload/dist/fields/validations.js` (we use `pnpm patch`), which both inputs fall back to.
+Related: [a comment on #11982](https://github.com/payloadcms/payload/issues/11982#issuecomment-2789466003) reports the same "minimum 3" for a 2-character password while 8 is enforced. That issue was locked without a fix.
 
 ## Link to the code that reproduces this issue
 
-https://github.com/scottybrown/payload-repros/tree/repro/password-minimum-not-configurable
+https://github.com/scottybrown/payload-repros/tree/repro/admin-password-inputs-ignore-password-field
 
 ## Reproduction Steps
 
-1. `pnpm dev`, and create the first user with an 8+ character password.
-2. Users > Create New, with any email and password `ab`, then Save: "minimum length of 3 characters". No request goes to `/api/users`.
-3. Change the password to `abc` and Save: the request goes to `/api/users`, and the server refuses it with "minimum length of 8 characters".
-4. Sign out and open `/admin/reset/anything`. Enter `ab` and submit: "minimum length of 3 characters". Any token works, because this check runs first.
+Copy .env.example to .env and point DATABASE_URL at an empty Postgres database.
 
-Expected: the admin checks against the field's minimum of 8 in steps 2 and 4.
+1. `pnpm dev`, open `/admin`, and create the first user with password `longenough1`.
+2. Users > Create New, with any email and password `ab`, then Save. It's refused with "minimum length of 3 characters".
+3. Change the password to `abc` and Save again. It's refused with "minimum length of 8 characters" ✅
 
-Related: #11982 (closed and locked, April 2025). A comment there reports the same "minimum 3" for a 2-character password while 8 is enforced.
+**Expected:** step 2 is refused with "minimum length of 8 characters", as step 3 is.
+
+**Actual:** step 2 says "minimum length of 3 characters", so the user is told the minimum is 3, then 8.
 
 ## Which area(s) are affected?
 
@@ -42,14 +35,25 @@ area: ui
 ```text
 Binaries:
   Node: 22.18.0
+  npm: 10.9.3
+  Yarn: N/A
   pnpm: 10.14.0
 Relevant Packages:
   payload: 3.91.0
   next: 16.4.0
   @payloadcms/db-postgres: 3.91.0
+  @payloadcms/drizzle: 3.91.0
+  @payloadcms/graphql: 3.91.0
+  @payloadcms/next/utilities: 3.91.0
+  @payloadcms/richtext-lexical: 3.91.0
+  @payloadcms/translations: 3.91.0
   @payloadcms/ui/shared: 3.91.0
   react: 19.2.6
+  react-dom: 19.2.6
 Operating System:
   Platform: darwin
   Arch: arm64
+  Version: Darwin Kernel Version 27.0.0: Tue Aug 11 21:06:24 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6030
+  Available memory (MB): 36864
+  Available CPU cores: 11
 ```
