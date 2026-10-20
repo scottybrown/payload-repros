@@ -36,16 +36,11 @@ Both are refused with "minimum length of 8 characters".
 So the user is told the minimum is 3, then 8. Step 2 is the admin's own check, which runs
 before anything is sent. Step 3 passes that check, and it's the server that refuses it.
 
-The reset password screen uses the same kind of input and also says 3. Its server side is a
-separate issue, payloadcms/payload#18823.
-
-Both screens render the password input inline with a fixed field,
-`PasswordField field={{ name: 'password', label, required: true }}`, and never read the
-collection's `password` field for validation:
-
-- `@payloadcms/ui` `dist/views/Edit/Auth/index.js`, the Create New / change password input.
-  It checks the override only for its access permissions (`hasPasswordFieldOverride`).
-- `@payloadcms/next` `dist/views/ResetPassword/ResetPasswordForm/index.js`, the reset form.
+Create New renders the password input inline with a fixed field,
+`PasswordField field={{ name: 'password', label, required: true }}`
+(`@payloadcms/ui` `dist/views/Edit/Auth/index.js`), and never reads the collection's `password`
+field for validation. It checks the override only for its access permissions
+(`hasPasswordFieldOverride`).
 
 ## Prior art
 
