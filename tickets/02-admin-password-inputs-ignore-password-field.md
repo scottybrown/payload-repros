@@ -2,11 +2,11 @@
 
 ## Describe the Bug
 
-A password minimum set with the documented `password` field override (`{ name: 'password', type: 'text', hidden: true, minLength: 8 }`) is enforced by the server, but **not** by the admin's own check on Users > Create New, which still uses the default minimum of 3. A 2-character password is refused with "minimum length of 3 characters", then a 3-character one is refused with "minimum length of 8 characters". The user is told two different minimums.
+A password minimum set with the documented `password` field override (`{ name: 'password', type: 'text', hidden: true, minLength: 8 }`) is enforced by the server, but **not** by the admin panel's in-browser check on Users > Create New, which still uses the default minimum of 3. A 2-character password is refused with "minimum length of 3 characters", then a 3-character one is refused with "minimum length of 8 characters". The user is told two different minimums.
 
 Create New renders the password input inline with a fixed field, `PasswordField field={{ name: 'password', label, required: true }}` (`@payloadcms/ui` `dist/views/Edit/Auth/index.js`), and never reads the collection's `password` field for validation. It checks the override only for its access permissions (`hasPasswordFieldOverride`).
 
-We've worked around this by patching the `password` validator's default `minLength` in `payload/dist/fields/validations.js`, which the admin's check falls back to.
+We've worked around this by patching the `password` validator's default `minLength` in `payload/dist/fields/validations.js`, which the in-browser check falls back to.
 
 Related: [a comment on #11982](https://github.com/payloadcms/payload/issues/11982#issuecomment-2789466003) reports the same "minimum 3" for a 2-character password while 8 is enforced. That issue was locked without a fix.
 
