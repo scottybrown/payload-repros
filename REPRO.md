@@ -33,8 +33,8 @@ Both are refused with "minimum length of 8 characters".
 | 2 | `ab` | "minimum length of **3** characters" |
 | 3 | `abc` | "minimum length of **8** characters" |
 
-So the user is told the minimum is 3, then 8. Step 2 is the admin's own check, which runs
-before anything is sent. Step 3 passes that check, and it's the server that refuses it.
+So the user is told the minimum is 3, then 8. Step 2 is the admin panel's in-browser check,
+which runs before anything is sent. Step 3 passes that check, and it's the server that refuses it.
 
 Create New renders the password input inline with a fixed field,
 `PasswordField field={{ name: 'password', label, required: true }}`
