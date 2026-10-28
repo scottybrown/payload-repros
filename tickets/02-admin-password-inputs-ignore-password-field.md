@@ -4,7 +4,7 @@
 
 A password minimum set with the documented `password` field override (`{ name: 'password', type: 'text', hidden: true, minLength: 8 }`) is enforced by the server, but **not** by the admin panel's in-browser check on Users > Create New, which still uses the default minimum of 3. A 2-character password is refused with "minimum length of 3 characters", then a 3-character one is refused with "minimum length of 8 characters". The user is told two different minimums.
 
-Create New renders the password input inline with a fixed field, `PasswordField field={{ name: 'password', label, required: true }}` (`@payloadcms/ui` `dist/views/Edit/Auth/index.js`), and never reads the collection's `password` field for validation. It checks the override only for its access permissions (`hasPasswordFieldOverride`).
+Create New renders the password input inline with a fixed field, `PasswordField field={{ name: 'password', label, required: true }}` (`packages/ui/src/views/Edit/Auth/index.tsx`). It reads the collection's `password` field only for its access permissions, never for validation.
 
 We've worked around this by patching the `password` validator's default `minLength` in `payload/dist/fields/validations.js`, which the in-browser check falls back to.
 
@@ -20,7 +20,7 @@ Copy .env.example to .env and point DATABASE_URL at an empty Postgres database.
 
 1. `pnpm dev`, open `/admin`, and create the first user with password `longenough1`.
 2. Users > Create New, with any email and password `ab`, then Save. It's refused with "minimum length of 3 characters".
-3. Change the password to `abc` and Save again. It's refused with "minimum length of 8 characters" ✅
+3. Change the password to `abc` and Save again. It's refused with "minimum length of 8 characters", as expected ✅
 
 **Expected:** step 2 is refused with "minimum length of 8 characters", as step 3 is.
 
