@@ -34,20 +34,20 @@ area: ui
 
 ```text
 Binaries:
-  Node: 22.18.0
-  npm: 10.9.3
+  Node: 24.22.1
+  npm: 11.19.1
   Yarn: N/A
   pnpm: 10.14.0
 Relevant Packages:
-  payload: 3.91.0
-  next: 16.4.0
-  @payloadcms/db-postgres: 3.91.0
-  @payloadcms/drizzle: 3.91.0
-  @payloadcms/graphql: 3.91.0
-  @payloadcms/next/utilities: 3.91.0
-  @payloadcms/richtext-lexical: 3.91.0
-  @payloadcms/translations: 3.91.0
-  @payloadcms/ui/shared: 3.91.0
+  payload: 3.92.1
+  next: 16.4.3
+  @payloadcms/db-postgres: 3.92.1
+  @payloadcms/drizzle: 3.92.1
+  @payloadcms/graphql: 3.92.1
+  @payloadcms/next/utilities: 3.92.1
+  @payloadcms/richtext-lexical: 3.92.1
+  @payloadcms/translations: 3.92.1
+  @payloadcms/ui/shared: 3.92.1
   react: 19.2.6
   react-dom: 19.2.6
 Operating System:
