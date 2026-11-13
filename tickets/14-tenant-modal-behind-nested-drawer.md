@@ -8,7 +8,7 @@ When the user can access more than one tenant, none is selected, and a tenant-sc
 
 We've worked around this by forcing `.assign-tenant-field-modal` to z-index 200 with `!important`.
 
-Related: #14727 and #10109 are similar modal and drawer problems. #17006 rewrote this modal for 4.0.
+Related: #17006 rewrote this modal for 4.0 using `DialogModal`, without `useDrawerDepth`, so this looks 3.x-only. #10109 fixed the same kind of problem for the unpublish modal in drawers. #14727 also leaves an invisible modal blocking the UI, but from missing visibility classes, not z-index.
 
 ## Link to the code that reproduces this issue
 
