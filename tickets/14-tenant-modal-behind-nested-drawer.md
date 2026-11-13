@@ -2,9 +2,9 @@
 
 ## Describe the Bug
 
-When no tenant is selected and a tenant-scoped document is created in a drawer inside another drawer, the assign-tenant modal opens underneath that drawer. It's hidden, but its focus trap still wins, so none of the drawer's fields can be typed in.
+When the user can access more than one tenant, none is selected, and a tenant-scoped document is created in a drawer inside another drawer, the assign-tenant modal opens underneath that drawer. It's hidden, but its focus trap still wins, so the drawer's fields can't be focused.
 
-`AssignTenantFieldModal` sets `zIndex: drawerZBase + useDrawerDepth()`, importing both from `@payloadcms/ui/elements/Drawer`. That's a separate copy of the drawer module from the prebundled `@payloadcms/ui` entry the admin's drawers use, so its depth context is never provided and the modal is always at 101. A nested drawer is at 102. One drawer deep they tie at 101 and the modal shows, which is why it only breaks when nested. The main entry doesn't export `useDrawerDepth` or `drawerZBase`, so a fix needs them exported there.
+`AssignTenantFieldModal` sets `zIndex: drawerZBase + useDrawerDepth()`, importing both from `@payloadcms/ui/elements/Drawer`. That's a separate copy of the drawer module from the prebundled `@payloadcms/ui` entry the admin's drawers use, so its depth context is never provided and the modal is always at 101. A nested drawer is at 102. One drawer deep they tie at 101 and the modal shows, which is why it only breaks when nested. The main entry doesn't export `useDrawerDepth` or `drawerZBase`, so the plugin can't simply import them from there instead.
 
 We've worked around this by forcing `.assign-tenant-field-modal` to z-index 200 with `!important`.
 
@@ -26,7 +26,7 @@ The repro adds the multi-tenant plugin for `media`, a `tenants` collection with 
 4. On the Pages list, clear "Filter by Tenant" in the sidebar.
 5. Open the page, then open Acme with the edit icon in Featured Tenant.
 6. In Acme's drawer, choose Create New under Image.
-7. Type in Alt.
+7. Click Alt and type.
 
 **Expected:** the assign-tenant modal shows above the media drawer, as it does one drawer deep (Create New under Image on Acme's own edit screen) ✅
 
