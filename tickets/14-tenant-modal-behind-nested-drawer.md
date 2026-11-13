@@ -30,7 +30,7 @@ The repro adds the multi-tenant plugin for `media`, a `tenants` collection with 
 
 **Expected:** the assign-tenant modal shows above the media drawer, as it does one drawer deep (Create New under Image on Acme's own edit screen) ✅
 
-**Actual:** the modal opens behind the media drawer (z-index 101 against 102). Focus keeps returning to it, so Alt stays empty.
+**Actual:** the modal opens behind the media drawer (z-index 101 against 102). Alt can't be focused or typed in. Alt is required, so the new media can't be saved.
 
 ## Which area(s) are affected?
 
