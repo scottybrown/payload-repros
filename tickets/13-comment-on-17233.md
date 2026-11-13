@@ -4,7 +4,9 @@ Still happening on Payload 3.93.0 with Next 16.4.3. On 3.92.1 we could only repr
 
 **Cause:** under Cache Components, Next keeps the page you leave hidden instead of unmounting it, and shows the same instance when you return. `usePreventLeave` (`packages/ui/src/elements/LeaveWithoutSaving/usePreventLeave.tsx`) never clears `cancelledURL.current` after following it, and `hasAccepted` stays true. When the hidden page is shown again, its effect runs again and pushes the list URL a second time.
 
-**Fix:** clear `cancelledURL.current` once it has been followed, as #17398 did before its author closed it. We also reset `hasAccepted` in `LeaveWithoutSaving`. With only the URL cleared, the revived page keeps `hasAccepted` true, so a second "Leave anyway" on it changes nothing and the user is stuck. #18702 avoids all of this on 4.0 by unmounting hidden admin pages, but it isn't in 3.x.
+**Fix:** clear `cancelledURL.current` once it has been followed, as #17398 did before its author closed it. #18702 avoids all of this on 4.0 by unmounting hidden admin pages, but it isn't in 3.x.
+
+**Note:** when we fixed it by clearing the URL alone, it caused a second bug. After one "Leave anyway", opening another document, editing it and choosing "Leave anyway" again did nothing, and the user was stuck on that document. The revived page still had `hasAccepted` set to true, so accepting again didn't change state and the effect never ran. Resetting `hasAccepted` in `LeaveWithoutSaving` after each leave fixed that as well.
 
 We've worked around this with a pnpm patch to `@payloadcms/ui` that does both. The prebundled copy in `dist/exports/client/index.js` needs the same change, because that's the file Next loads.
 
