@@ -1,16 +1,14 @@
-# Multi-tenant: the assign-tenant modal opens behind a nested drawer and takes its focus, so the drawer can't be used
+# Multi-tenant: the assign-tenant modal opens behind a nested drawer and takes its focus
 
 ## Describe the Bug
 
-When a tenant-scoped document is created in a drawer opened inside another drawer, and no tenant is selected, the plugin's assign-tenant modal opens underneath the drawer. It can't be seen, but its focus trap is the newest, so every click or keypress in the drawer sends focus back to the modal's tenant select. None of the drawer's fields can be typed in.
+When no tenant is selected and a tenant-scoped document is created in a drawer inside another drawer, the assign-tenant modal opens underneath that drawer. It's hidden, but its focus trap still wins, so none of the drawer's fields can be typed in.
 
-`AssignTenantFieldModal` sets its z-index to `drawerZBase + useDrawerDepth()`, but imports both from `@payloadcms/ui/elements/Drawer` (`packages/plugin-multi-tenant/src/components/AssignTenantFieldModal/index.client.tsx`). The drawers the admin renders come from the prebundled `@payloadcms/ui` entry, which has its own copy of the drawer code and its own depth context. Nothing provides the subpath's context, so the modal always reads its default depth of 1 and sits at z-index 101. A drawer inside another drawer is at 102. One drawer deep, the two tie at 101 and the modal, later in the page, shows on top, which is why this only appears with nested drawers.
+`AssignTenantFieldModal` sets `zIndex: drawerZBase + useDrawerDepth()`, importing both from `@payloadcms/ui/elements/Drawer`. That's a separate copy of the drawer module from the prebundled `@payloadcms/ui` entry the admin's drawers use, so its depth context is never provided and the modal is always at 101. A nested drawer is at 102. One drawer deep they tie at 101 and the modal shows, which is why it only breaks when nested. The main entry doesn't export `useDrawerDepth` or `drawerZBase`, so a fix needs them exported there.
 
-The main `@payloadcms/ui` entry doesn't export `useDrawerDepth` or `drawerZBase`, so a fix would export them there and have the plugin import them from `@payloadcms/ui`.
+We've worked around this by forcing `.assign-tenant-field-modal` to z-index 200 with `!important`.
 
-We've worked around this by raising `.assign-tenant-field-modal` to z-index 200 in `custom.scss`, with `!important` to beat the inline style.
-
-Related: #14727 (the same modal's container blocking clicks) and #10109 (the same kind of fix for the unpublish modal in drawers). #17006 rewrote this modal for 4.0; whether that fixes it is unchecked.
+Related: #14727 and #10109 are similar modal and drawer problems. #17006 rewrote this modal for 4.0.
 
 ## Link to the code that reproduces this issue
 
@@ -20,20 +18,19 @@ https://github.com/scottybrown/payload-repros/tree/repro/tenant-modal-behind-nes
 
 Copy .env.example to .env and point DATABASE_URL at an empty Postgres database.
 
-The repro adds the multi-tenant plugin with `media` as its only tenant-scoped collection, and `userHasAccessToAllTenants: () => true`. Tenants have an `image` upload field (to `media`), and a `pages` collection has a `featuredTenant` relationship to tenants.
+The repro adds the multi-tenant plugin for `media`, a `tenants` collection with an `image` upload, and a `pages` collection with a `featuredTenant` relationship.
 
 1. `pnpm dev`, open `/admin`, and create the first user with password `longenough1`.
-2. Tenants > Create New, name it `Acme` and Save. Create a second tenant, `Beta`.
-3. Pages > Create New, title `Home`, choose `Acme` as Featured Tenant, and Save.
-4. Go to the Pages list and clear "Filter by Tenant" in the sidebar with its ×, then open Home. Creating the tenants selected Acme there, and the modal only opens when no tenant is selected.
-5. Open Acme in a drawer with the edit icon next to it in Featured Tenant. Under Image, choose Create New. The media drawer opens, inside the tenant drawer.
-6. Click Alt and type.
+2. Create two tenants, `Acme` and `Beta`.
+3. Create a page with Acme as its Featured Tenant.
+4. On the Pages list, clear "Filter by Tenant" in the sidebar.
+5. Open the page, then open Acme with the edit icon in Featured Tenant.
+6. In Acme's drawer, choose Create New under Image.
+7. Type in Alt.
 
-For comparison: open Acme from Tenants instead, and choose Create New under Image. The media drawer is now one deep, and the "Assign [Untitled]" modal shows on top of it, as expected ✅
+**Expected:** the assign-tenant modal shows above the media drawer, as it does one drawer deep (Create New under Image on Acme's own edit screen) ✅
 
-**Expected:** in step 5, the "Assign [Untitled]" modal shows above the media drawer.
-
-**Actual:** the modal is open but hidden under the media drawer (z-index 101 against 102). Nothing can be typed in Alt, because focus keeps returning to the modal's hidden tenant select.
+**Actual:** the modal opens behind the media drawer (z-index 101 against 102). Focus keeps returning to it, so Alt stays empty.
 
 ## Which area(s) are affected?
 
